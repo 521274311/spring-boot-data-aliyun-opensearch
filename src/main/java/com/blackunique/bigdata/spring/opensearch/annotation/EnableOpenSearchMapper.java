@@ -31,6 +31,8 @@ public @interface EnableOpenSearchMapper {
      * ${dataSourceConfigPrefix}.access-key: ack配置
      * ${dataSourceConfigPrefix}.secret: secret配置
      * 可选项
+     * ${dataSourceConfigPrefix}.endpoint: 地域配置, 默认: SHENZHEN
+     * @see club.kingon.sql.opensearch.api.Endpoint 地域配置项
      * ${dataSourceConfigPrefix}.app-name: 应用名称(若配置则在查询该应用时将会优化查询)
      * ${dataSourceConfigPrefix}.intranet: 是否内网请求, 默认: false
      * ${dataSourceConfigPrefix}.connect-timeout: 连接超时时间,单位ms,默认10000
