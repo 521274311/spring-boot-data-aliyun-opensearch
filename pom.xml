@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.blackunique.bigdata.spring</groupId>
-    <artifactId>spring-boot-aliyun-opensearch</artifactId>
+    <artifactId>spring-boot-data-aliyun-opensearch</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
