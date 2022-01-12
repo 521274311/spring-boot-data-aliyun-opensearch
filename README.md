@@ -82,7 +82,7 @@ public class TestController {
     @Autowired
     private ItemMapper mapper;
 
-    @GetMapping("/items")
+    @GetMapping("/xxx")
     public Object items() {
         return mapper.selectGroup(
             QuerySqlBuilder.INSTANCE
