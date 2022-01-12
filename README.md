@@ -43,7 +43,7 @@ import lombok.Data;
 import club.kingon.sql.builder.annotation.Table;
 
 @Data
-@Table("bd_tbk_price_comparison_search")
+@Table("xxx")
 public class Item {
 
     private String category;
