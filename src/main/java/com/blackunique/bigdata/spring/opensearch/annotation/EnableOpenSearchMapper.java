@@ -19,9 +19,15 @@ public @interface EnableOpenSearchMapper {
     @AliasFor("basePackages")
     String[] value() default {};
 
+    /**
+     * 需要扫描接口的包, 若不配置则扫码启动程序所在的包下的所有的类
+     */
     @AliasFor("value")
     String[] basePackages() default {};
 
+    /**
+     * 需要扫描的接口
+     */
     Class<?>[] basePackageClasses() default {};
 
     /**

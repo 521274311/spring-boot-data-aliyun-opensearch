@@ -59,6 +59,7 @@ import club.kingon.sql.builder.spring.annotation.Mapper;
 import com.blackunique.bigdata.spring.opensearch.OpenSearchBaseMapper;
 import com.example.entity.Item;
 
+// 若接口实现了OpenSearchBaseMapper接口可不加@Mapper注解, 否则必须加上@Mapper注解
 @Mapper
 public interface ItemMapper extends OpenSearchBaseMapper<Item> {
 }

@@ -1,6 +1,7 @@
 package com.blackunique.bigdata.spring.opensearch;
 
 import club.kingon.sql.builder.spring.annotation.Mapper;
+import com.blackunique.bigdata.spring.opensearch.filter.OpenSearchBaseMapperTypeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -35,7 +36,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
     public void registerFilters() {
 
         addIncludeFilter(new AnnotationTypeFilter(Mapper.class));
-
+        addIncludeFilter(new OpenSearchBaseMapperTypeFilter());
 
         // exclude package-info.java
         addExcludeFilter((metadataReader, metadataReaderFactory) -> {
