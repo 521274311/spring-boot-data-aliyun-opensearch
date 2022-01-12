@@ -174,8 +174,7 @@ public class OpenSearchBaseMapperHandler<T> {
         while (it.hasNext()) {
             SearchResult searchResult = it.next();
             if (searchResult == null) {
-                // todo
-                log.warn("Current SearchResult is null.");
+                log.warn("Part of the \"SearchResult\" is null.");
                 continue;
             }
             try {
@@ -187,12 +186,10 @@ public class OpenSearchBaseMapperHandler<T> {
                         result.addAll(queryResult.getResult().getItems().stream().map(e -> JSON.toJavaObject(e.getFields(), beanClass)).collect(Collectors.toList()));
                     }
                 } else {
-                    // todo
-                    log.warn("");
+                    log.warn("Part of the \"SearchResult\" status is \"" + queryResult.getStatus() + "\", ignore. Errors:" + queryResult.getErrors());
                 }
             } catch (Exception e) {
-                // todo
-                log.warn("");
+                log.warn("Part of the \"SearchResult\" is abnormal, ignore. Exception: " + e.getMessage());
             }
         }
 
