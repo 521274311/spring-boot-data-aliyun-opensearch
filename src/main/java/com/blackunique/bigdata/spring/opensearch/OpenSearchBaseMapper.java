@@ -2,7 +2,6 @@ package com.blackunique.bigdata.spring.opensearch;
 
 import club.kingon.sql.builder.SelectSqlBuilder;
 import club.kingon.sql.builder.SqlBuilder;
-import club.kingon.sql.builder.entry.Alias;
 import club.kingon.sql.builder.spring.BaseMapper;
 import club.kingon.sql.opensearch.entry.Group;
 import com.aliyun.opensearch.sdk.generated.search.Aggregate;

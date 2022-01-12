@@ -3,7 +3,6 @@ package com.blackunique.bigdata.spring.opensearch;
 import club.kingon.sql.builder.SelectSqlBuilder;
 import club.kingon.sql.builder.SqlBuilder;
 import club.kingon.sql.builder.WhereSqlBuilder;
-import club.kingon.sql.builder.entry.Alias;
 import club.kingon.sql.builder.spring.annotation.Delete;
 import club.kingon.sql.builder.spring.annotation.Insert;
 import club.kingon.sql.builder.spring.annotation.Select;
