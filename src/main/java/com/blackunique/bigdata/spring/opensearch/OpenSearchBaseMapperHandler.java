@@ -3,6 +3,9 @@ package com.blackunique.bigdata.spring.opensearch;
 import club.kingon.sql.builder.SelectSqlBuilder;
 import club.kingon.sql.builder.SqlBuilder;
 import club.kingon.sql.builder.WhereSqlBuilder;
+import club.kingon.sql.builder.annotation.Column;
+import club.kingon.sql.builder.entry.Alias;
+import club.kingon.sql.builder.inner.ObjectMapperUtils;
 import club.kingon.sql.builder.spring.annotation.Delete;
 import club.kingon.sql.builder.spring.annotation.Insert;
 import club.kingon.sql.builder.spring.annotation.Select;
@@ -11,6 +14,7 @@ import club.kingon.sql.builder.spring.util.SqlUtils;
 import club.kingon.sql.opensearch.OpenSearchQueryIterator;
 import club.kingon.sql.opensearch.OpenSearchSqlClient;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyun.opensearch.sdk.generated.search.Aggregate;
 import com.aliyun.opensearch.sdk.generated.search.Distinct;
 import com.aliyun.opensearch.sdk.generated.search.general.SearchResult;
@@ -18,8 +22,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -183,7 +191,7 @@ public class OpenSearchBaseMapperHandler<T> {
                     if (!CollectionUtils.isEmpty(aggregateSet) || sql.contains(InnerConstants.GROUP) || sql.contains(InnerConstants.GROUP_LOWER)) {
                         result.addAll(queryResult.getResult().getFacet());
                     } else {
-                        result.addAll(queryResult.getResult().getItems().stream().map(e -> JSON.toJavaObject(e.getFields(), beanClass)).collect(Collectors.toList()));
+                        result.addAll(queryResult.getResult().getItems().stream().map(e -> jsonObjectToBean(e.getFields(), beanClass)).collect(Collectors.toList()));
                     }
                 } else {
                     log.warn("Part of the \"SearchResult\" status is \"" + queryResult.getStatus() + "\", ignore. Errors:" + queryResult.getErrors());
@@ -203,5 +211,50 @@ public class OpenSearchBaseMapperHandler<T> {
             return new HashSet<>(result);
         }
         return result;
+    }
+
+    private T jsonObjectToBean(JSONObject json, Class<T> beanClass) {
+        List<Alias> columnFields = ObjectMapperUtils.getColumnFields(beanClass);
+        try {
+            T bean = beanClass.newInstance();
+            List<Alias> delayColumnFields = new ArrayList<>();
+            for (Alias columnField : columnFields) {
+                Field field = ObjectMapperUtils.getField(beanClass, columnField.getAlias());
+
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
+                Column column = ObjectMapperUtils.getFieldAnnotation(beanClass, columnField.getAlias(), Column.class);
+                if (column != null && (Function.class.isAssignableFrom(column.readMapFun()) || BiFunction.class.isAssignableFrom(column.readMapFun()))) {
+                    delayColumnFields.add(columnField);
+                } else {
+                    field.set(bean, json.getObject(columnField.getOrigin(), field.getType()));
+                }
+            }
+            if (!delayColumnFields.isEmpty()) {
+                for (Alias columnField : delayColumnFields) {
+                    Field field = ObjectMapperUtils.getField(beanClass, columnField.getAlias());
+                    Column column = ObjectMapperUtils.getFieldAnnotation(beanClass, columnField.getAlias(), Column.class);
+                    if (Function.class.isAssignableFrom(column.readMapFun())) {
+                        try {
+                            Function fun = (Function) ObjectMapperUtils.getSingleObject(column.readMapFun());
+                            field.set(bean, fun.apply(json.get(columnField.getOrigin())));
+                        } catch (NoSuchMethodException | InvocationTargetException e) {
+                            throw new RuntimeException("column name " + column.value() + " readMapFun can't be created.", e);
+                        }
+                    } else {
+                        try {
+                            BiFunction fun = (BiFunction) ObjectMapperUtils.getSingleObject(column.readMapFun());
+                            field.set(bean, fun.apply(bean, json.get(columnField.getOrigin())));
+                        } catch (NoSuchMethodException | InvocationTargetException e) {
+                            throw new RuntimeException("column name " + column.value() + " readMapFun can't be created.", e);
+                        }
+                    }
+                }
+            }
+            return bean;
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException("Class " + beanClass.getName() + " must have a default constructor.", e);
+        }
     }
 }
