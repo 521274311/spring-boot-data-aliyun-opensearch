@@ -18,13 +18,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>club.kingons.plugins.sql</groupId>
+            <groupId>club.kingons.extension.sql</groupId>
             <artifactId>aliyun-opensearch-sql</artifactId>
             <version>${aliyun-opensearch-sql.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>club.kingons.plugins.sql</groupId>
+            <groupId>club.kingons.extension.sql</groupId>
             <artifactId>sql-builder</artifactId>
             <version>${sql-builder.version}</version>
         </dependency>
