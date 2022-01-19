@@ -1,8 +1,9 @@
 package com.blackunique.bigdata.spring.opensearch;
 
-import club.kingon.sql.builder.SelectSqlBuilder;
-import club.kingon.sql.builder.SqlBuilder;
-import club.kingon.sql.builder.WhereSqlBuilder;
+import club.kingon.sql.builder.SQLBuilder;
+import club.kingon.sql.builder.SelectSQLBuilder;
+import club.kingon.sql.builder.Tuple2;
+import club.kingon.sql.builder.WhereSQLBuilder;
 import club.kingon.sql.builder.annotation.Column;
 import club.kingon.sql.builder.entry.Alias;
 import club.kingon.sql.builder.inner.ObjectMapperUtils;
@@ -11,6 +12,7 @@ import club.kingon.sql.builder.spring.annotation.Insert;
 import club.kingon.sql.builder.spring.annotation.Select;
 import club.kingon.sql.builder.spring.annotation.Update;
 import club.kingon.sql.builder.spring.util.SqlUtils;
+import club.kingon.sql.builder.util.ConditionUtils;
 import club.kingon.sql.opensearch.OpenSearchQueryIterator;
 import club.kingon.sql.opensearch.OpenSearchSqlClient;
 import com.alibaba.fastjson.JSON;
@@ -21,6 +23,7 @@ import com.aliyun.opensearch.sdk.generated.search.general.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -47,7 +50,7 @@ public class OpenSearchBaseMapperHandler<T> {
     public OpenSearchBaseMapperHandler(Class<?> mapperInterface, Class<T> beanClass, OpenSearchSqlClient client) {
         this.beanClass = beanClass;
         this.client = client;
-        this.prefixSql = SqlBuilder.select(beanClass).from(beanClass).build();
+        this.prefixSql = SQLBuilder.select(beanClass).from(beanClass).build();
     }
 
     public Object handle(Method method, Object[] args) {
@@ -75,16 +78,16 @@ public class OpenSearchBaseMapperHandler<T> {
 
     private Object handleDeleteMethod(Method method, Object[] args) {
         if (args == null || args.length == 0) throw new RuntimeException("There must be at least one delete method parameter.");
-        return handleDeleteSql(method, SqlBuilder.delete(beanClass).where((WhereSqlBuilder) args[0]).build());
+        return handleDeleteSql(method, SQLBuilder.delete(beanClass).where((WhereSQLBuilder) args[0]).build());
     }
 
     private Object handleUpdateMethod(Method method, Object[] args) {
         if (args == null || args.length == 0) throw new RuntimeException("There must be at least one update method parameter.");
-        WhereSqlBuilder sqlBuilder = SqlBuilder.update(args[0]);
+        WhereSQLBuilder sqlBuilder = SQLBuilder.update(args[0]);
         if (args.length > 1) {
             for (int i = 1; i < args.length; i++) {
-                if  (args[i] instanceof WhereSqlBuilder) {
-                    sqlBuilder = sqlBuilder.and((WhereSqlBuilder) args[i]);
+                if  (args[i] instanceof WhereSQLBuilder) {
+                    sqlBuilder = sqlBuilder.and((WhereSQLBuilder) args[i]);
                 }
             }
         }
@@ -93,22 +96,22 @@ public class OpenSearchBaseMapperHandler<T> {
 
     private Object handleInsertMethod(Method method, Object[] args) {
         if (args == null || args.length == 0) throw new RuntimeException("There must be at least one insert method parameter.");
-        return handleInsertSql(method, SqlBuilder.insertInto(args).build());
+        return handleInsertSql(method, SQLBuilder.insertInto(args).build());
     }
 
     private Object handleSelectMethod(Method method, Object[] args) {
-        SqlBuilder extensionSqlBuilder = null;
+        SQLBuilder extensionSqlBuilder = null;
         Set<Distinct> distinctSet = null;
         Set<Aggregate> aggregateSet = null;
-        SelectSqlBuilder selectSqlBuilder = null;
+        SelectSQLBuilder selectSqlBuilder = null;
         List<Object> remainArgs = new ArrayList<>();
         if (args != null && args.length > 0) {
             for(Object arg : args) {
-                if (arg instanceof SelectSqlBuilder) {
-                    selectSqlBuilder = (SelectSqlBuilder) arg;
+                if (arg instanceof SelectSQLBuilder) {
+                    selectSqlBuilder = (SelectSQLBuilder) arg;
                 }
-                else if (arg instanceof SqlBuilder && extensionSqlBuilder == null) {
-                    extensionSqlBuilder = (SqlBuilder) arg;
+                else if (arg instanceof SQLBuilder && extensionSqlBuilder == null) {
+                    extensionSqlBuilder = (SQLBuilder) arg;
                 } else if (arg instanceof Distinct[]) {
                     distinctSet = Arrays.stream((Distinct[])arg).collect(Collectors.toSet());
                 } else if (arg instanceof Aggregate[]) {
@@ -119,19 +122,21 @@ public class OpenSearchBaseMapperHandler<T> {
             }
         }
         String sql;
+        Object[] precompileArgs = null;
         if (extensionSqlBuilder != null) {
-            String sqlSuffix = extensionSqlBuilder.build();
+            String sqlSuffix = extensionSqlBuilder.precompileSQL();
+            precompileArgs = extensionSqlBuilder.precompileArgs();
             if (selectSqlBuilder != null) {
-                sql = selectSqlBuilder.from(beanClass).build() + extensionSqlBuilder.build();
+                sql = selectSqlBuilder.from(beanClass).build() + sqlSuffix;
             } else if (sqlSuffix.toUpperCase().contains(InnerConstants.FROM)) {
                 sql = sqlSuffix;
             } else {
-                sql = prefixSql + extensionSqlBuilder.build();
+                sql = prefixSql + sqlSuffix;
             }
         } else {
             sql = prefixSql;
         }
-        return handleSelectSql(method,  sql, remainArgs.toArray(new Object[0]), distinctSet, aggregateSet);
+        return handleSelectSql(method,  sql, precompileArgs, distinctSet, aggregateSet);
     }
 
     private Object handleAnnotation(Method method, Object[] args) {
@@ -176,7 +181,10 @@ public class OpenSearchBaseMapperHandler<T> {
         Class<?> returnType = method.getReturnType();
 
         // parse
-        sql = SqlUtils.parseSql(sql, method, args);
+        Tuple2<String, Object[]> pt = SqlUtils.parseSql(sql, method, args);
+        // opensearch sql unsupport precompile sql.
+        sql = sqlInject(pt._1, pt._2);
+
         List result = new ArrayList<>();
         OpenSearchQueryIterator it = client.query(sql, distinctSet, aggregateSet);
         while (it.hasNext()) {
@@ -211,6 +219,38 @@ public class OpenSearchBaseMapperHandler<T> {
             return new HashSet<>(result);
         }
         return result;
+    }
+
+    private String sqlInject(String sql, Object[] args) {
+        if (StringUtils.isEmpty(sql)) return "";
+        if (args == null || args.length == 0) return sql;
+        StringBuilder sqlStringBuilder = new StringBuilder(sql.length() * 2);
+        int p = 0;
+        int i = 0, k = 0;
+        for (; i < sql.length() && k < args.length; i++) {
+            if (sql.charAt(i) == '"' && i > 0 && sql.charAt(i - 1) != '\\') {
+                if (p == 0) {
+                    p = 1;
+                } else if (p == 1) {
+                    p = 0;
+                }
+            } else if (sql.charAt(i) == '\'' && i > 0 && sql.charAt(i - 1) != '\\') {
+                if (p == 0) {
+                    p = 2;
+                } else if (p == 2) {
+                    p = 0;
+                }
+            }
+            if (p == 0 && sql.charAt(i) == '?') {
+                sqlStringBuilder.append(ConditionUtils.parseValue(args[k++]));
+            } else {
+                sqlStringBuilder.append(sql.charAt(i));
+            }
+        }
+        if (i < sql.length()) {
+            sqlStringBuilder.append(sql.substring(i));
+        }
+        return sqlStringBuilder.toString();
     }
 
     private T jsonObjectToBean(JSONObject json, Class<T> beanClass) {
