@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * @author dragons
  * @date 2021/12/14 9:59
  */
-public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar {
+public class OpenSearchMapperScannerRegistrar implements ImportBeanDefinitionRegistrar {
 
 
     @Override
@@ -34,7 +34,7 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar {
     void registerBeanDefinitions(AnnotationMetadata annoMeta, AnnotationAttributes annoAttrs,
                                  BeanDefinitionRegistry registry, String beanName) {
 
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MapperScannerConfigurer.class);
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(OpenSearchMapperScannerConfigurer.class);
 
 
         List<String> basePackages = new ArrayList<>();
@@ -64,7 +64,7 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar {
     }
 
     private static String generateBaseBeanName(AnnotationMetadata importingClassMetadata, int index) {
-        return importingClassMetadata.getClassName() + "#" + MapperScannerRegistrar.class.getSimpleName() + "#" + index;
+        return importingClassMetadata.getClassName() + "#" + OpenSearchMapperScannerRegistrar.class.getSimpleName() + "#" + index;
     }
 
     private static String getDefaultBasePackage(AnnotationMetadata importingClassMetadata) {

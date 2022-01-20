@@ -1,6 +1,6 @@
 package com.blackunique.bigdata.spring.opensearch.annotation;
 
-import com.blackunique.bigdata.spring.opensearch.MapperScannerRegistrar;
+import com.blackunique.bigdata.spring.opensearch.OpenSearchMapperScannerRegistrar;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
 
@@ -12,7 +12,7 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-@Import(MapperScannerRegistrar.class)
+@Import(OpenSearchMapperScannerRegistrar.class)
 @Documented
 public @interface EnableOpenSearchMapper {
 

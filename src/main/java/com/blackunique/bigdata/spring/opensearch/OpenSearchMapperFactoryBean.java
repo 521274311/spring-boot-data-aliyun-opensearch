@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author dragons
  * @date 2021/12/14 10:09
  */
-public class MapperFactoryBean<T> implements FactoryBean<T>, EnvironmentAware {
+public class OpenSearchMapperFactoryBean<T> implements FactoryBean<T>, EnvironmentAware {
 
     private Class<T> mapperInterface;
 
@@ -28,11 +28,11 @@ public class MapperFactoryBean<T> implements FactoryBean<T>, EnvironmentAware {
 
     private static final Map<String, OpenSearchSqlClient> openSearchSqlClientMap = new ConcurrentHashMap<>();
 
-    public MapperFactoryBean() {
+    public OpenSearchMapperFactoryBean() {
         // intentionally empty
     }
 
-    public MapperFactoryBean(Class<T> mapperInterface) {
+    public OpenSearchMapperFactoryBean(Class<T> mapperInterface) {
         this.mapperInterface = mapperInterface;
     }
 

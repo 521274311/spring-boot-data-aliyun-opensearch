@@ -25,7 +25,7 @@ import java.util.Optional;
  * @author dragons
  * @date 2021/12/14 10:02
  */
-public class MapperScannerConfigurer
+public class OpenSearchMapperScannerConfigurer
     implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {
 
     private String beanName;
@@ -57,7 +57,7 @@ public class MapperScannerConfigurer
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         processPropertyPlaceHolders();
-        ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
+        OpenSearchClassPathMapperScanner scanner = new OpenSearchClassPathMapperScanner(registry);
         scanner.setResourceLoader(this.applicationContext);
         scanner.setDataSourceConfigPrefix(this.dataSourceConfigPrefix);
 

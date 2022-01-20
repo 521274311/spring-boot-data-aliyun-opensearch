@@ -20,16 +20,16 @@ import java.util.Set;
  * @author dragons
  * @date 2021/12/14 10:05
  */
-public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
+public class OpenSearchClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClassPathMapperScanner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenSearchClassPathMapperScanner.class);
 
-    private Class<? extends MapperFactoryBean> mapperFactoryBeanClass = MapperFactoryBean.class;
+    private Class<? extends OpenSearchMapperFactoryBean> mapperFactoryBeanClass = OpenSearchMapperFactoryBean.class;
 
     private String dataSourceConfigPrefix;
 
 
-    public ClassPathMapperScanner(BeanDefinitionRegistry registry) {
+    public OpenSearchClassPathMapperScanner(BeanDefinitionRegistry registry) {
         super(registry, false);
     }
 
@@ -64,18 +64,18 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
         for (BeanDefinitionHolder holder : beanDefinitions) {
             definition = (GenericBeanDefinition) holder.getBeanDefinition();
             String beanClassName = definition.getBeanClassName();
-            LOGGER.debug("Creating MapperFactoryBean with name '" + holder.getBeanName() + "' and '" + beanClassName
+            LOGGER.debug("Creating OpenSearchMapperFactoryBean with name '" + holder.getBeanName() + "' and '" + beanClassName
                 + "' mapperInterface");
 
             // the mapper interface is the original class of the bean
-            // but, the actual class of the bean is MapperFactoryBean
+            // but, the actual class of the bean is OpenSearchMapperFactoryBean
             definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName); // issue #59
             definition.setBeanClass(this.mapperFactoryBeanClass);
 
             definition.getPropertyValues().add("dataSourceConfigPrefix", this.dataSourceConfigPrefix);
 
 
-            LOGGER.debug("Enabling autowire by type for MapperFactoryBean with name '" + holder.getBeanName() + "'.");
+            LOGGER.debug("Enabling autowire by type for OpenSearchMapperFactoryBean with name '" + holder.getBeanName() + "'.");
             definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
         }
     }
@@ -90,7 +90,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
         if (super.checkCandidate(beanName, beanDefinition)) {
             return true;
         } else {
-            LOGGER.warn("Skipping MapperFactoryBean with name '" + beanName + "' and '"
+            LOGGER.warn("Skipping OpenSearchMapperFactoryBean with name '" + beanName + "' and '"
                 + beanDefinition.getBeanClassName() + "' mapperInterface" + ". Bean already defined with the same name!");
             return false;
         }
