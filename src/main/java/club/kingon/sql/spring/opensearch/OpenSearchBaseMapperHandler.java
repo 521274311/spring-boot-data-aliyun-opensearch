@@ -1,4 +1,4 @@
-package com.blackunique.bigdata.spring.opensearch;
+package club.kingon.sql.spring.opensearch;
 
 import club.kingon.sql.builder.SQLBuilder;
 import club.kingon.sql.builder.SelectSQLBuilder;

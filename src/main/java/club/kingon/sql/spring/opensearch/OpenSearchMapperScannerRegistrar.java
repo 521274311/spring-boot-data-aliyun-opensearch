@@ -1,6 +1,6 @@
-package com.blackunique.bigdata.spring.opensearch;
+package club.kingon.sql.spring.opensearch;
 
-import com.blackunique.bigdata.spring.opensearch.annotation.EnableOpenSearchMapper;
+import club.kingon.sql.spring.opensearch.annotation.EnableOpenSearchMapper;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;

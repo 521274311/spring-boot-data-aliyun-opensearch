@@ -25,8 +25,9 @@ spring:
     read-timeout: 5000
 ```
 2.Application类 添加 Enable 注解
+
 ```java
-import com.blackunique.bigdata.spring.opensearch.annotation.EnableOpenSearchMapper;
+import EnableOpenSearchMapper;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
@@ -54,9 +55,10 @@ public class Item {
 }
 ```
 4.编写dao层接口
+
 ```java
 import club.kingon.sql.builder.spring.annotation.Mapper;
-import com.blackunique.bigdata.spring.opensearch.OpenSearchBaseMapper;
+import OpenSearchBaseMapper;
 import com.example.entity.Item;
 
 // 若接口实现了OpenSearchBaseMapper接口可不加@Mapper注解, 否则必须加上@Mapper注解

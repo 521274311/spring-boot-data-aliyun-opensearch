@@ -1,4 +1,4 @@
-package com.blackunique.bigdata.spring.opensearch;
+package club.kingon.sql.spring.opensearch;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;

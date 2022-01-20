@@ -1,7 +1,7 @@
-package com.blackunique.bigdata.spring.opensearch;
+package club.kingon.sql.spring.opensearch;
 
 import club.kingon.sql.builder.spring.annotation.Mapper;
-import com.blackunique.bigdata.spring.opensearch.filter.OpenSearchBaseMapperTypeFilter;
+import club.kingon.sql.spring.opensearch.filter.OpenSearchBaseMapperTypeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;

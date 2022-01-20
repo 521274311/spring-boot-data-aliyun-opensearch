@@ -1,6 +1,6 @@
-package com.blackunique.bigdata.spring.opensearch.filter;
+package club.kingon.sql.spring.opensearch.filter;
 
-import com.blackunique.bigdata.spring.opensearch.OpenSearchBaseMapper;
+import club.kingon.sql.spring.opensearch.OpenSearchBaseMapper;
 import org.springframework.core.type.ClassMetadata;
 import org.springframework.core.type.filter.AbstractClassTestingTypeFilter;
 
