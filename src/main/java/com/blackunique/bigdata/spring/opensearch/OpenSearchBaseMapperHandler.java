@@ -154,7 +154,9 @@ public class OpenSearchBaseMapperHandler<T> {
             client.delete(delete.value());
             return 1;
         } else if (select != null){
-            return handleSelectSql(method, select.value(), args, null, null);
+            // parse
+            Tuple2<String, Object[]> pt = SqlUtils.parseSql(select.value(), method, args);
+            return handleSelectSql(method, pt._1, pt._2, null, null);
         }
         return null;
     }
@@ -180,10 +182,8 @@ public class OpenSearchBaseMapperHandler<T> {
     private Object handleSelectSql(Method method, String sql, Object[] args, Set<Distinct> distinctSet, Set<Aggregate> aggregateSet) {
         Class<?> returnType = method.getReturnType();
 
-        // parse
-        Tuple2<String, Object[]> pt = SqlUtils.parseSql(sql, method, args);
         // opensearch sql unsupport precompile sql.
-        sql = sqlInject(pt._1, pt._2);
+        sql = sqlInject(sql, args);
 
         List result = new ArrayList<>();
         OpenSearchQueryIterator it = client.query(sql, distinctSet, aggregateSet);
