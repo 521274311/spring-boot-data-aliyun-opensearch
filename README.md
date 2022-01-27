@@ -78,6 +78,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
+
 
 @RestController
 public class TestController {
@@ -85,11 +87,20 @@ public class TestController {
     @Autowired
     private ItemMapper mapper;
 
-    @GetMapping("/xxx")
+    @GetMapping("/items")
     public Object items() {
-        return mapper.selectGroup(
+        // 查询列表
+        return mapper.selectList(
             QuerySqlBuilder.INSTANCE
-                .where("goods_id", Operator.IN, (1111, 2222, 3333 , 4444))
+                .where("goods_id", Operator.IN, Arrays.asList(1111, 2222, 3333 , 4444))
+        );
+    }
+
+    @GetMapping("/group")
+    public Object group() {
+        return mapper.selectGroup(
+            QuerySqlBuilder.INSTANCE.where("goods_name", Operator.LRLIKE, "xxx")
+                .groupBy("brand_name")
         );
     }
 }
