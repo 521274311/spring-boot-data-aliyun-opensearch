@@ -1,8 +1,8 @@
 package club.kingon.sql.spring.opensearch;
 
 
-import club.kingon.sql.builder.SQLBuilder;
-import club.kingon.sql.builder.SelectSQLBuilder;
+import club.kingon.sql.builder.SelectSqlBuilder;
+import club.kingon.sql.builder.SqlBuilder;
 import club.kingon.sql.builder.spring.BaseMapper;
 import club.kingon.sql.opensearch.entry.Group;
 import com.aliyun.opensearch.sdk.generated.search.Aggregate;
@@ -19,20 +19,20 @@ import java.util.List;
 public interface OpenSearchBaseMapper<T> extends BaseMapper<T> {
 
     @NonNull
-    List<T> selectList(@Nullable SQLBuilder builder, @Nullable SelectSQLBuilder selectSqlBuilder, @Nullable Distinct[] distinctSet);
+    List<T> selectList(@Nullable SqlBuilder builder, @Nullable SelectSqlBuilder selectSqlBuilder, @Nullable Distinct[] distinctSet);
 
     @NonNull
-    List<T> selectList(@Nullable SQLBuilder builder, @Nullable Distinct[] distinctSet);
+    List<T> selectList(@Nullable SqlBuilder builder, @Nullable Distinct[] distinctSet);
 
     @NonNull
-    List<Group> selectGroup(@Nullable SQLBuilder builder);
+    List<Group> selectGroup(@Nullable SqlBuilder builder);
 
     @NonNull
-    List<Group> selectGroup(@Nullable SQLBuilder builder, @Nullable SelectSQLBuilder selectSqlBuilder);
+    List<Group> selectGroup(@Nullable SqlBuilder builder, @Nullable SelectSqlBuilder selectSqlBuilder);
 
     @NonNull
-    List<Group> selectGroup(@Nullable SQLBuilder sqlBuilder, @Nullable SelectSQLBuilder selectSqlBuilder, @Nullable Aggregate[] aggregateSet);
+    List<Group> selectGroup(@Nullable SqlBuilder sqlBuilder, @Nullable SelectSqlBuilder selectSqlBuilder, @Nullable Aggregate[] aggregateSet);
 
     @NonNull
-    List<Group> selectGroup(@Nullable SQLBuilder builder, @Nullable SelectSQLBuilder selectSqlBuilder, @Nullable Distinct[] distinctSet, @Nullable Aggregate[] aggregateSet);
+    List<Group> selectGroup(@Nullable SqlBuilder builder, @Nullable SelectSqlBuilder selectSqlBuilder, @Nullable Distinct[] distinctSet, @Nullable Aggregate[] aggregateSet);
 }
