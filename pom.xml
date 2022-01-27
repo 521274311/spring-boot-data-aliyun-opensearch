@@ -11,8 +11,8 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <aliyun-opensearch-sql.version>0.1.1-SNAPSHOT</aliyun-opensearch-sql.version>
-        <sql-builder.version>0.0.3-SNAPSHOT</sql-builder.version>
+        <aliyun-opensearch-sql.version>0.1.1</aliyun-opensearch-sql.version>
+        <sql-builder.version>0.0.3</sql-builder.version>
         <spring.version>5.2.12.RELEASE</spring.version>
     </properties>
 
