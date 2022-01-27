@@ -1,7 +1,8 @@
 ## 阿里云OpenSearchSql与SpringBoot集成
 
-
 ### 将aliyun-opensearch-sql包、sql-builder包与spring集成, 开箱即用(目前仅实现查询功能, 其他功能正在开发中)
+#### aliyun-opensearch-sql包地址: https://github.com/521274311/aliyun-opensearch-sql
+#### SQL-Builder包地址: https://github.com/521274311/sql-builder
 ### PS: 查询的SqlBuilder参数必须通过QuerySqlBuilder.INSTANCE来构建, SelectSqlBuilder 必须通过SqlBuilder.select(...)构建
 
 ##### 使用示例
