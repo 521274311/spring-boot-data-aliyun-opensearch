@@ -124,7 +124,7 @@ public class OpenSearchBaseMapperHandler<T> {
         String sql;
         Object[] precompileArgs = null;
         if (extensionSqlBuilder != null) {
-            String sqlSuffix = extensionSqlBuilder.precompileSQL();
+            String sqlSuffix = extensionSqlBuilder.precompileSql();
             precompileArgs = extensionSqlBuilder.precompileArgs();
             if (selectSqlBuilder != null) {
                 sql = selectSqlBuilder.from(beanClass).build() + sqlSuffix;
