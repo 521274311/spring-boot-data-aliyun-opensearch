@@ -25,7 +25,7 @@
 
         <dependency>
             <groupId>club.kingons.extension.sql</groupId>
-            <artifactId>sql-builder</artifactId>
+            <artifactId>sql-builder-spring-boot</artifactId>
             <version>${sql-builder.version}</version>
         </dependency>
 
