@@ -1,5 +1,6 @@
 package club.kingon.sql.spring.opensearch;
 
+import club.kingon.sql.builder.config.GlobalConfig;
 import club.kingon.sql.spring.opensearch.annotation.EnableOpenSearchMapper;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -52,6 +53,8 @@ public class OpenSearchMapperScannerRegistrar implements ImportBeanDefinitionReg
         }
 
         builder.addPropertyValue("basePackage", StringUtils.collectionToCommaDelimitedString(basePackages));
+
+        GlobalConfig.CONDITION_PRIORITY = annoAttrs.getEnum("conditionPriorityStrategy");
 
         String dataSourceConfigPrefix = annoAttrs.getString("dataSourceConfigPrefix");
         if (StringUtils.hasText(dataSourceConfigPrefix)) {

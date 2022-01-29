@@ -1,5 +1,6 @@
 package club.kingon.sql.spring.opensearch.annotation;
 
+import club.kingon.sql.builder.config.ConditionPriority;
 import club.kingon.sql.spring.opensearch.OpenSearchMapperScannerRegistrar;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
@@ -48,4 +49,9 @@ public @interface EnableOpenSearchMapper {
      * ${dataSourceConfigPrefix}.default-search-mode: 默认搜索模式,值域[HIT, SCROLL], 若设置为hit将不在支持scroll滚动查询，未设置limit将默认limit 10
      */
     String dataSourceConfigPrefix() default "spring.datasource";
+
+    /**
+     * 条件逻辑优先级策略
+     */
+    ConditionPriority conditionPriorityStrategy() default ConditionPriority.DEFAULT;
 }
