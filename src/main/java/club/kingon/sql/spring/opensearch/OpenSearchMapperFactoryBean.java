@@ -51,9 +51,9 @@ public class OpenSearchMapperFactoryBean<T> implements FactoryBean<T>, Environme
         Endpoint endpoint = Endpoint.valueOf(environment.getProperty(dataSourceConfigPrefix + ".endpoint", "SHENZHEN"));
         String appName = environment.getProperty(dataSourceConfigPrefix + ".app-name", environment.getProperty(dataSourceConfigPrefix + ".appName"));
         boolean intranet = Boolean.parseBoolean(environment.getProperty(dataSourceConfigPrefix + ".intranet", "false"));
-        int connectTimeout = Integer.parseInt(environment.getProperty(dataSourceConfigPrefix + ".connect-timeout", "10000"));
-        int readTimeout = Integer.parseInt(environment.getProperty(dataSourceConfigPrefix + ".read-timeout", "5000"));
-        int startWaitMills = Integer.parseInt(environment.getProperty(dataSourceConfigPrefix + ".start-wait-mills", environment.getProperty(dataSourceConfigPrefix + ".startWithMills", "2000")));
+        int connectTimeout = Integer.parseInt(environment.getProperty(dataSourceConfigPrefix + ".connect-timeout", environment.getProperty(dataSourceConfigPrefix + ".connectTimeout", "10000")));
+        int readTimeout = Integer.parseInt(environment.getProperty(dataSourceConfigPrefix + ".read-timeout", environment.getProperty(dataSourceConfigPrefix + ".readTimeout", "5000")));
+        int startWaitMills = Integer.parseInt(environment.getProperty(dataSourceConfigPrefix + ".start-wait-mills", environment.getProperty(dataSourceConfigPrefix + ".startWaitMills", "2000")));
         boolean enableManagement = Boolean.parseBoolean(environment.getProperty(dataSourceConfigPrefix + ".enable-management", environment.getProperty(dataSourceConfigPrefix +".enableManagement", "true")));
         SearchQueryModeEnum mode = SearchQueryModeEnum.valueOf(environment.getProperty(dataSourceConfigPrefix + ".default-search-mode", environment.getProperty(dataSourceConfigPrefix + ".defaultSearchMode", "HIT")));
 
