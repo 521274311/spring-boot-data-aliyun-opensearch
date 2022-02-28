@@ -1,0 +1,61 @@
+{
+  "groups": [],
+  "properties": [
+    {
+      "name": "spring.datasource.access-key",
+      "type": "java.lang.String",
+      "description": "OpenSearch auth access-key"
+    },
+    {
+      "name": "spring.datasource.secret",
+      "type": "java.lang.String",
+      "description": "OpenSearch auth secret"
+    },
+    {
+      "name": "spring.datasource.endpoint",
+      "type": "club.kingon.sql.opensearch.api.Endpoint",
+      "defaultValue": "SHENZHEN"
+    },
+    {
+      "name": "spring.datasource.app-name",
+      "type": "java.lang.String",
+      "description": "OpenSearch app name"
+    },
+    {
+      "name": "spring.datasource.intranet",
+      "type": "java.lang.Boolean",
+      "description": "inner network u can set true, else false",
+      "defaultValue": "false"
+    },
+    {
+      "name": "spring.datasource.connect-timeout",
+      "type": "java.lang.Integer",
+      "description": "connect timeout mills",
+      "defaultValue": "10000"
+    },
+    {
+      "name": "spring.datasource.read-timeout",
+      "type": "java.lang.Integer",
+      "description": "read timeout mills",
+      "defaultValue": "5000"
+    },
+    {
+      "name": "spring.datasource.start-wait-mills",
+      "type": "java.lang.Integer",
+      "description": "wait app schema loaded by time",
+      "defaultValue": "2000"
+    },
+    {
+      "name": "spring.datasource.enable-management",
+      "type": "java.lang.Boolean",
+      "description": "enable SQL optimization",
+      "defaultValue": "true"
+    },
+    {
+      "name": "spring.datasource.default-search-mode",
+      "type": "club.kingon.sql.opensearch.SearchQueryModeEnum",
+      "description": "search mode",
+      "defaultValue": "HIT"
+    }
+  ]
+}
