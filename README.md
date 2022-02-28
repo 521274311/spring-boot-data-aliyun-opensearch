@@ -40,14 +40,17 @@ public class XXXApplication {
 } 
 ```
 3.编写实体类
+
 ```java
+import club.kingon.sql.builder.annotation.Column;
 import lombok.Data;
 import club.kingon.sql.builder.annotation.Table;
 
 @Data
 @Table("xxx")
 public class Item {
-
+    /* 定义别名 */
+    @Column("category_name")
     private String category;
 
     private String goodsId;
@@ -62,7 +65,6 @@ import club.kingon.sql.builder.spring.annotation.Mapper;
 import OpenSearchBaseMapper;
 import com.example.entity.Item;
 
-// 若接口实现了OpenSearchBaseMapper接口可不加@Mapper注解, 否则必须加上@Mapper注解
 @Mapper
 public interface ItemMapper extends OpenSearchBaseMapper<Item> {
 }
