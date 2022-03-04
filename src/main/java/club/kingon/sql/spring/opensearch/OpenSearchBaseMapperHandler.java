@@ -6,6 +6,7 @@ import club.kingon.sql.builder.Tuple2;
 import club.kingon.sql.builder.WhereSqlBuilder;
 import club.kingon.sql.builder.annotation.Column;
 import club.kingon.sql.builder.entry.Alias;
+import club.kingon.sql.builder.enums.Operator;
 import club.kingon.sql.builder.inner.ObjectMapperUtils;
 import club.kingon.sql.builder.spring.annotation.Delete;
 import club.kingon.sql.builder.spring.annotation.Insert;
@@ -15,6 +16,7 @@ import club.kingon.sql.builder.spring.util.SqlUtils;
 import club.kingon.sql.builder.util.ConditionUtils;
 import club.kingon.sql.opensearch.OpenSearchQueryIterator;
 import club.kingon.sql.opensearch.OpenSearchSqlClient;
+import club.kingon.sql.opensearch.parser.SQLParserException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.opensearch.sdk.generated.search.Aggregate;
@@ -34,6 +36,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ * todo Improve addition, deletion, modification and query
  * @author dragons
  * @date 2021/12/30 19:40
  */
@@ -78,7 +81,24 @@ public class OpenSearchBaseMapperHandler<T> {
 
     private Object handleDeleteMethod(Method method, Object[] args) {
         if (args == null || args.length == 0) throw new RuntimeException("There must be at least one delete method parameter.");
-        return handleDeleteSql(method, SqlBuilder.delete(beanClass).where((WhereSqlBuilder) args[0]).build());
+        if (args.length == 1 && args[0] instanceof SqlBuilder) {
+            String suffixSql = ((SqlBuilder) args[0]).build();
+            if (suffixSql.toLowerCase().contains("from")) {
+                return handleDeleteSql(method, suffixSql);
+            } else {
+                return handleDeleteSql(method, SqlBuilder.delete(beanClass).where((WhereSqlBuilder) args[0]).build());
+            }
+        } else {
+            List<Alias> primaries = ObjectMapperUtils.getPrimaries(beanClass);
+            if (primaries.size() != args.length) {
+                throw new SQLParserException("Primaries count is not match args count.");
+            }
+            WhereSqlBuilder sqlBuilder = SqlBuilder.delete(beanClass).where(primaries.get(0).getOrigin(), Operator.EQ, args[0]);
+            for (int i = 1; i < primaries.size(); i++) {
+                sqlBuilder = sqlBuilder.and(primaries.get(i).getOrigin(), Operator.EQ, args[i]);
+            }
+            return handleDeleteSql(method, sqlBuilder.build());
+        }
     }
 
     private Object handleUpdateMethod(Method method, Object[] args) {
@@ -145,14 +165,11 @@ public class OpenSearchBaseMapperHandler<T> {
         Select select = method.getAnnotation(Select.class);
         Delete delete = method.getAnnotation(Delete.class);
         if (insert != null) {
-            client.insert(insert.value());
-            return 1;
+            throw new UnsupportedOperationException("Insert Annotation is not supported now.");
         } else if (update != null) {
-            client.update(update.value());
-            return 1;
+            throw new UnsupportedOperationException("Update Annotation is not supported now.");
         } else if (delete != null) {
-            client.delete(delete.value());
-            return 1;
+            throw new UnsupportedOperationException("Delete Annotation is not supported now.");
         } else if (select != null){
             // parse
             Tuple2<String, Object[]> pt = SqlUtils.parseSql(select.value(), method, args);

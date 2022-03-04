@@ -4,6 +4,7 @@
 #### aliyun-opensearch-sql包地址: https://github.com/521274311/aliyun-opensearch-sql
 #### SQL-Builder包地址: https://github.com/521274311/sql-builder
 ### PS: 查询的SqlBuilder参数必须通过QuerySqlBuilder.INSTANCE来构建, SelectSqlBuilder 必须通过SqlBuilder.select(...)构建
+### 暂不支持 @Insert, @Update, @Delete 注解
 
 ##### 使用示例
 1. 配置文件 application.yml
