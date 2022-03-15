@@ -6,13 +6,13 @@
 
     <groupId>club.kingons.extension.sql</groupId>
     <artifactId>spring-boot-data-aliyun-opensearch</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <aliyun-opensearch-sql.version>0.1.1-SNAPSHOT</aliyun-opensearch-sql.version>
-        <sql-builder.version>0.0.4</sql-builder.version>
+        <sql-builder.version>0.0.5-SNAPSHOT</sql-builder.version>
         <spring.version>5.2.12.RELEASE</spring.version>
     </properties>
 
