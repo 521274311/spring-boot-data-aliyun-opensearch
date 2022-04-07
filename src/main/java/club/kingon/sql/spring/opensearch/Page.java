@@ -28,11 +28,11 @@ public class Page<T> extends club.kingon.sql.builder.spring.Page<T> {
         super(current, size, total);
     }
 
-    public static <T> club.kingon.sql.builder.spring.Page<T> of(long current, long size) {
+    public static <T> Page<T> of(long current, long size) {
         return of(current, size, 0L);
     }
 
-    public static <T> club.kingon.sql.builder.spring.Page<T> of(long current, long size, long total) {
-        return new club.kingon.sql.builder.spring.Page(current, size, total);
+    public static <T> Page<T> of(long current, long size, long total) {
+        return new Page<>(current, size, total);
     }
 }
