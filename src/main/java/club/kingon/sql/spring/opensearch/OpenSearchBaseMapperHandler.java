@@ -8,6 +8,7 @@ import club.kingon.sql.builder.annotation.Column;
 import club.kingon.sql.builder.entry.Alias;
 import club.kingon.sql.builder.enums.Operator;
 import club.kingon.sql.builder.inner.ObjectMapperUtils;
+import club.kingon.sql.builder.spring.IPage;
 import club.kingon.sql.builder.spring.annotation.Delete;
 import club.kingon.sql.builder.spring.annotation.Insert;
 import club.kingon.sql.builder.spring.annotation.Select;
@@ -124,6 +125,7 @@ public class OpenSearchBaseMapperHandler<T> {
         Set<Distinct> distinctSet = null;
         Set<Aggregate> aggregateSet = null;
         SelectSqlBuilder selectSqlBuilder = null;
+        IPage<T> page = null;
         List<Object> remainArgs = new ArrayList<>();
         if (args != null && args.length > 0) {
             for(Object arg : args) {
@@ -136,6 +138,8 @@ public class OpenSearchBaseMapperHandler<T> {
                     distinctSet = Arrays.stream((Distinct[])arg).collect(Collectors.toSet());
                 } else if (arg instanceof Aggregate[]) {
                     aggregateSet = Arrays.stream((Aggregate[])arg).collect(Collectors.toSet());
+                } else if (arg instanceof IPage) {
+                    page = (IPage<T>) arg;
                 } else {
                     remainArgs.add(arg);
                 }
@@ -156,7 +160,7 @@ public class OpenSearchBaseMapperHandler<T> {
         } else {
             sql = prefixSql;
         }
-        return handleSelectSql(method,  sql, precompileArgs, distinctSet, aggregateSet);
+        return handleSelectSql(method, page,  sql, precompileArgs, distinctSet, aggregateSet);
     }
 
     private Object handleAnnotation(Method method, Object[] args) {
@@ -173,7 +177,7 @@ public class OpenSearchBaseMapperHandler<T> {
         } else if (select != null){
             // parse
             Tuple2<String, Object[]> pt = SqlUtils.parseSql(select.value(), method, args);
-            return handleSelectSql(method, pt._1, pt._2, null, null);
+            return handleSelectSql(method, null, pt._1, pt._2, null, null);
         }
         return null;
     }
@@ -196,11 +200,17 @@ public class OpenSearchBaseMapperHandler<T> {
         return 1;
     }
 
-    private Object handleSelectSql(Method method, String sql, Object[] args, Set<Distinct> distinctSet, Set<Aggregate> aggregateSet) {
+    private Object handleSelectSql(Method method, IPage<T> page, String sql, Object[] args, Set<Distinct> distinctSet, Set<Aggregate> aggregateSet) {
         Class<?> returnType = method.getReturnType();
 
         // opensearch sql unsupport precompile sql.
         sql = sqlInject(sql, args);
+
+        // dont check to get quick speech
+        if (page != null) {
+            sql += " LIMIT " + page.offset() + ", " + page.getSize();
+        }
+
 
         List result = new ArrayList<>();
         OpenSearchQueryIterator it = client.query(sql, distinctSet, aggregateSet);
@@ -212,6 +222,20 @@ public class OpenSearchBaseMapperHandler<T> {
             }
             try {
                 ExtensionOpenSearchQueryResult queryResult = JSON.parseObject(searchResult.getResult(), ExtensionOpenSearchQueryResult.class);
+                // page handler
+                if (IPage.class.isAssignableFrom(method.getReturnType())) {
+                    if (page == null) {
+                        page = Page.of(1L, 10L);
+                    }
+                    page.setRecords(queryResult.getResult().getItems().stream().map(e -> jsonObjectToBean(e.getFields(), beanClass)).collect(Collectors.toList()));
+                    // viewtotal equal total because user view only viewtotal item.
+                    page.setTotal(queryResult.getResult().getViewtotal());
+                    page.setSize(queryResult.getResult().getNum());
+                    if (page instanceof Page) {
+                        ((Page<T>) page).setErrors(queryResult.getErrors());
+                    }
+                    return page;
+                }
                 if ("OK".equals(queryResult.getStatus())) {
                     if (!CollectionUtils.isEmpty(aggregateSet) || sql.contains(InnerConstants.GROUP) || sql.contains(InnerConstants.GROUP_LOWER)) {
                         result.addAll(queryResult.getResult().getFacet());
